@@ -5,6 +5,7 @@ The software developed is available in this page. This software is used to get C
 
 --
 REQUIREMENTS
+
 Java 1.5 or more
 Minimum 512 Mb of RAM (Recommended 4 Gb of RAM)
 Any processor (Recommended multi-core processor)
@@ -13,6 +14,7 @@ Enough space to save results
 	
 --
 CONFIGURATION AND INPUTS
+
 You must to create a set-up file (with extension .ini). In that file write values for parameters required to run the application.
 Parameters are: 
 DataSet=Data set (in SAM format) of reads obtained experimentally.
@@ -36,6 +38,7 @@ The setup.ini file (in the same root of this file) is an example of a configurat
 
 --
 EXECUTION
+
 To run, just write on terminal:
 java -jar ClusterDetection_v*.jar Setup_file_name.ini
 
