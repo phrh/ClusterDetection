@@ -57,12 +57,14 @@ The setup.ini file (in the same root of this file) is an example of a configurat
 
 --
 EXECUTION
+
 To run, just write on terminal:
 java -jar ClusterDetection_v*.jar Setup_file_name.ini
 
 
 --
 OUTPUTS
+
 1) Total_clusters: List of all clusters (Optionally can be in format .SAM and .BED)
 
 2) Filtered_Clusters: List of clusters that pass the filters
