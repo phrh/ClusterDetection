@@ -1,7 +1,16 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+# CLIP-seq CLuster Detection - Tool to detect clusters of an experimental data set of RBP obtained by CLIP-seq protocol.
+#
+# Created by Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra on August 2014.
+# Copyright (c) 2014 Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra. Universidad Antonio Narino. All rights reserved.
+#
+# This file is part of CLIP-seq Cluster Detection.
+#
+# CLIP-seq Cluster Detection is free software: you can redistribute it and/or modify it under the terms of the 
+# GNU General Public License as published by the Free Software Foundation, version 2.
+*/
+
+
 package miscellaneous;
 
 import filesProcess.CD_FromSam;
@@ -24,6 +33,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import structures.Chromosome;
+
 
 /**
  *
@@ -70,33 +80,6 @@ public class Functions {
            Logger.getLogger(CD_FromSam.class.getName()).log(Level.SEVERE, null, ex);
            System.exit(0);
        }
-        /* 340 Segs aprox
-        final byte[] messageBytes = text.getBytes(Charset.forName("ISO-8859-1"));
-        final long appendSize = messageBytes.length;
-        RandomAccessFile raf;
-		
-        try 
-        {
-			raf = new RandomAccessFile(file, "rw");
-			raf.seek(raf.length());
-			final FileChannel fc = raf.getChannel();
-		    final MappedByteBuffer mbf = fc.map(FileChannel.MapMode.READ_WRITE, fc.position(), appendSize);
-		    fc.close();
-		    
-		    mbf.put(messageBytes);
-		} 
-		catch (FileNotFoundException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-        catch (IOException e) 
-        {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-        
-       
     }
     
     

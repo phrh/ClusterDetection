@@ -1,3 +1,16 @@
+/*
+# CLIP-seq CLuster Detection - Tool to detect clusters of an experimental data set of RBP obtained by CLIP-seq protocol.
+#
+# Created by Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra on August 2014.
+# Copyright (c) 2014 Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra. Universidad Antonio Narino. All rights reserved.
+#
+# This file is part of CLIP-seq Cluster Detection.
+#
+# CLIP-seq Cluster Detection is free software: you can redistribute it and/or modify it under the terms of the 
+# GNU General Public License as published by the Free Software Foundation, version 2.
+*/
+
+
 package structures;
 
 import java.io.BufferedReader;
@@ -10,8 +23,6 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import miscellaneous.ChromosomeSubsequence;
 
 
 
@@ -1110,14 +1121,8 @@ public class Cluster extends Thread{
  				 br.close();
              }	 
          } 
-         catch (FileNotFoundException ex) 
-         {
-             Logger.getLogger(ChromosomeSubsequence.class.getName()).log(Level.SEVERE, null, ex);
-         } 
-         catch (IOException ex) 
-         {
-             Logger.getLogger(ChromosomeSubsequence.class.getName()).log(Level.SEVERE, null, ex);
-         }
+         catch (FileNotFoundException ex)   {} 
+         catch (IOException ex)   {}
      }
     
     
