@@ -1,4 +1,4 @@
-CLIP-seq CLUSTER DETECTION TOOL
+CLIP-seq CLUSTER DETECTION TOOL 
 ================
 
 The software developed is available in this page. This software is used to get Clusters on experimental data of RNA-Binding Proteins (RBP), including profiles of clusters.
@@ -42,11 +42,18 @@ Export_BED=Flag to export cluster's list in BED. By default is FALSE.
 
 Filter_Entrophy=Flag to use Shannon's Entropy to filter noise reads. By default is TRUE.
 
-Mutations=Type of mutations to consider.
+Mutations=Type of mutations to consider (Options:All, T2C, A2C, A2G, A2T, C2A, C2G, C2T, G2A, G2C, G2T, T2A, T2G).
 
-Insertions=Type of insertions to consider.
+Insertions=Type of insertions to consider (Options: All, A, C, G, T).
 
-Deletions=Type of deletions to consider.
+Deletions=Type of deletions to consider (Options: All, A, C, G, T).
+
+
+Additional parameters in v1.5:
+
+Background=Path of background file.
+
+Background_Score=Filter of minimum read's score value in background to take into account in comparision.
 
 
 If there's no FASTA files, the application show a message and not execute.
