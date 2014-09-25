@@ -23,7 +23,7 @@ import miscellaneous.Functions;
 
 /**
  * This class represents a general structure of a chromosome by SAM, when just use a little of information of the chromosome
-  * @author Eng. Paula Reyes, Ph.D. -- M.Sc. Eng. Carlos Sierra
+ * @author Eng. Paula Reyes, Ph.D. -- M.Sc. Eng. Carlos Sierra
  * Universidad Antonio Narino 
  */
 public class Chromosome extends Thread
