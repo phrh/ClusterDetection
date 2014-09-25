@@ -37,6 +37,54 @@ public class Background {
 	
 	
 	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	/**
+	 * @return the readsPositive
+	 */
+	public Vector<Read> getReadsPositive() {
+		return readsPositive;
+	}
+
+
+	/**
+	 * @param readsPositive the readsPositive to set
+	 */
+	public void setReadsPositive(Vector<Read> readsPositive) {
+		this.readsPositive = readsPositive;
+	}
+
+
+	/**
+	 * @return the readsNegative
+	 */
+	public Vector<Read> getReadsNegative() {
+		return readsNegative;
+	}
+
+
+	/**
+	 * @param readsNegative the readsNegative to set
+	 */
+	public void setReadsNegative(Vector<Read> readsNegative) {
+		this.readsNegative = readsNegative;
+	}
+
+
+	/**
 	 * 
 	 * @param start
 	 * @param end

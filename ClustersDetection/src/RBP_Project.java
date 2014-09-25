@@ -52,6 +52,7 @@ public class RBP_Project {
             boolean filterEntropy = true;
             int window = 8;
             int amount = 1000;
+            int bg_score = 3;
             
             
       		System.gc(); // Call Garbage Collector
@@ -71,6 +72,8 @@ public class RBP_Project {
                 {
                 	field_value = line.split("=");
                 	
+                	
+                	//Read parameters
                 	switch(field_value[0])
                 	{
                 		case "DataSet":
@@ -126,7 +129,7 @@ public class RBP_Project {
                 		break;
                 		case "Noise_Reads":
                 		{
-                			//noisePath = field_value[1];
+                			noisePath = field_value[1];
                 		}
                 		break;
                 		case "Export_SAM":
@@ -169,6 +172,11 @@ public class RBP_Project {
                 			amount = Integer.parseInt(field_value[1]);
                 		}
                 		break;
+                		case "Background_Score":
+                		{
+                			bg_score = Integer.parseInt(field_value[1]);
+                		}
+                		break;
                 	}
                 	
                 	line = br.readLine();
@@ -206,7 +214,7 @@ public class RBP_Project {
             try 
             {
                CD_FromSam cdSam = new CD_FromSam();
-               cdSam.readFile(dataset, folder, minLenghts, minSequences, fileLog, fastaPath, snpPath, filterEntropy, exportSAM, exportBED, noisePath, mutations, deletions, insertions, window, amount, setupFile);
+               cdSam.readFile(dataset, folder, minLenghts, minSequences, fileLog, fastaPath, snpPath, filterEntropy, exportSAM, exportBED, noisePath, mutations, deletions, insertions, window, amount, setupFile, bg_score);
                     
                Thread.sleep(500);
                Functions.sentMail(mail, "The experiment is complete.\n", "DataSet: " + experiment);

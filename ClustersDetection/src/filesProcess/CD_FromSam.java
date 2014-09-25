@@ -26,9 +26,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import miscellaneous.Functions;
+import structures.Background;
 import structures.Chromosome;
 import structures.Cluster;
-import structures.Read;
+
 
 /**
  * This class take a sequences-reads set (in SAM Format) to detect and extract the clusters 
@@ -41,12 +42,14 @@ public class CD_FromSam extends Thread
     //Attributes for the class
     private Vector<Chromosome> chromosomes; //Chromosomes information
     private Vector<Cluster> ranking = new Vector<>(); //Ranking of candidate clusters to search motif
-    private Vector<Read> nonReads = new Vector<Read>(); //Vector of background
+    private Vector<Background> nonReads = new Vector<Background>(); //Vector of background
     private String experiment = ""; //DataSet used, extracted from dataset filename
     private String folderResults; //Path for save results
     private boolean bed; //If save clusters in BED format
     private boolean sam; //If save clusters in SAM format
+    private int bg_score;
     private int counterSNP = 0; //Amount of SNPs that binding with clusters
+    private int counterBackground = 0;
     
     /**
      * Zero-parameters constructor
@@ -80,12 +83,13 @@ public class CD_FromSam extends Thread
      * @throws FileNotFoundException
      * @throws InterruptedException
      */
-    public void readFile(String file, String folderResults, int minLength, int minSequences, String fileLog, String fastaPath, String snpPath, boolean entropy, boolean sam, boolean bed, String noisePath, String[] mutations, String[] deletions, String[] insertions, int window, int amount, String setup) throws FileNotFoundException, InterruptedException
+    public void readFile(String file, String folderResults, int minLength, int minSequences, String fileLog, String fastaPath, String snpPath, boolean entropy, boolean sam, boolean bed, String noisePath, String[] mutations, String[] deletions, String[] insertions, int window, int amount, String setup, int bg_score) throws FileNotFoundException, InterruptedException
     {
         this.experiment = file.substring(file.lastIndexOf("/") + 1, file.length()); //Name of data set
         this.folderResults = folderResults; //Folder to save results
         this.bed = bed; //If BED
         this.sam = sam; //If SAM
+        this.bg_score = bg_score;
         long startTime = System.nanoTime(); //Start time counter 
         
 
@@ -106,6 +110,7 @@ public class CD_FromSam extends Thread
         int numberMutations; //Number of mutations in read
         String chromosome; //Chromosome of read
         
+        
         //Experimental data set information (Use for statistics analysis)
         int contNoValids = 0; //Non-valid reads
         int contValids = 0; //Valid reads
@@ -118,7 +123,10 @@ public class CD_FromSam extends Thread
 
         
         //Load background
-        this.nonReads(noisePath);
+        if(!noisePath.toLowerCase().equals("none"))
+        {
+        	this.nonReads(noisePath); 
+        }
         
         
         //-- Process file --//
@@ -258,13 +266,12 @@ public class CD_FromSam extends Thread
                 
                 if(!currentLine[2].equals("*") && !currentLine[2].equals("_") && !chromosome.substring(0, 4).equals("chrU")) //Valid if the read is aligned to a chromosome
                 {
-                	
                 	sequence = currentLine[9]; //Sequence of current read
-                   
-                    processRead = true; //Read can be processed
+                	processRead = true; //Read can be processed
                     
                     if(entropy) //Define by parameters: Use entropy filter
                     {
+                    	//TODO explain constants
                     	processRead = (this.mononucleotideEntrophy(sequence) >= 0.7 && this.dinucleotideEntrophy(sequence) >= 1.5) ? true : false;
                     	
                     	if(!processRead)
@@ -357,11 +364,15 @@ public class CD_FromSam extends Thread
                     line = br.readLine();
                     if(line == null)
                     {
-                        //Print and save values
+                    	this.counterBackground++;
+                    	
+                    	//Print and save values
                         System.out.println("Total reads: " + contTotals + "\tNo valid reads: " + contNoValids + "\tValid reads: " + contValids);
                         System.out.println("Reads Lengths-Filter: " + sequences_fl + "\tValid-reads length filter: " + sequences_fl_vr);
+                        System.out.println("Reads Background-Filter: " + this.counterBackground);
                         log += "\nTotal reads: " + contTotals + "\tNo valid reads: " + contNoValids + "\tValid reads: " + contValids; 
                         log += "\nReads Lengths-Filter: " + sequences_fl + "\tValid-reads length filter: " + sequences_fl_vr;
+                        log += "\nReads Background-Filter: " + this.counterBackground + "\n";
                         
                         if(entropy) //Add entropies statistics
                         {
@@ -397,6 +408,7 @@ public class CD_FromSam extends Thread
         log += "\n\nElapsed Time: " + elapsedTimeInSec + " seconds\n\nStart Clusters Detection";
         
         
+        //Process choromosomes in parallel
         for(int l = 0; l < this.chromosomes.size(); l++)
         {
             this.chromosomes.get(l).start(); //Start clusters detection for each chromosome
@@ -437,16 +449,24 @@ public class CD_FromSam extends Thread
         
         
         //Create ranking of clusters 
-        this.createRanking(amount);
+        //this.createRanking(amount);
         
         //Get trials to make cross-validation: 10 subsets for training, 10 subsets for testing
         this.getTrials(window);
+        double tempTime = elapsedTimeInSec;
+        elapsedTimeInSec = (System.nanoTime() - startTime) * 1.0e-9;
+        System.out.println("\n\nTrials Building Time: " + (elapsedTimeInSec - tempTime) + " seconds");
+        log += "\n\nTrials Building Time: " + (elapsedTimeInSec - tempTime) + " seconds";
+        
         
         //Save log data in a file
         Functions.saveInFile(fileLog, log);
         
         //Stops this thread - Ends of cluster detection process
         this.interrupt();
+        
+        //Start priority to motif search
+        //Priority priority = new Priority(setup);
     }
     
     
@@ -462,6 +482,7 @@ public class CD_FromSam extends Thread
         
         int start;
         int end;
+        int score;
         String chromosome;
         String strand;
         
@@ -477,22 +498,39 @@ public class CD_FromSam extends Thread
             	// ExperimentID   Strand   Chromosome  Start  QMap  CIGAR  -  -  -  Sequence Quality  -  -  NumberMutations
                 currentLine = line.split("\t"); //Split the read (line in columns) separate by tabs
             	
-                chromosome = currentLine[3]; //Parse the value of start position of current read
-                strand = currentLine[3]; //Parse the value of start position of current read
-                start = Integer.parseInt(currentLine[3]); //Parse the value of start position of current read
-                end = Integer.parseInt(currentLine[3]); //Parse the value of start position of current read
+                chromosome = currentLine[0]; //Parse the value of start position of current read
+                strand = currentLine[5]; //Parse the value of start position of current read
+                start = Integer.parseInt(currentLine[1]); //Parse the value of start position of current read
+                end = Integer.parseInt(currentLine[2]); //Parse the value of start position of current read
+                score = Integer.parseInt(currentLine[2]); //Parse the value of start position of current read
                 
-                this.nonReads.add(new Read("", chromosome, strand, start, end,  0, 0.0, "", "", ""));
+                int i = 0;
                 
-            	line = br.readLine();
+                if(score >= this.bg_score)
+                {
+	                for(i = 0; i < this.nonReads.size(); i++)
+	                {
+	                	if(this.nonReads.get(i).getName().equals(chromosome))
+	                	{
+	                		this.nonReads.get(i).insert(start, end, strand, score);
+	                		break;
+	                	}
+	                }
+	                
+	                if(i == this.nonReads.size())
+	                {
+	                	this.nonReads.add(new Background(chromosome));
+	                	this.nonReads.get(i).insert(start, end, strand, score);
+	                }
+                }
+                
+                line = br.readLine();
             }
         } 
         catch (IOException e) 
         {
             System.out.println("ERROR: ClusterDetection.ReadNoiseFile(). Can't read first line.");
         }
-        
-        System.out.println("\nTotal reads background: " + this.nonReads.size());
     }
     
     
@@ -510,14 +548,16 @@ public class CD_FromSam extends Thread
     	
     	for(int i = 0; i < this.nonReads.size(); i++)
     	{
-    		if(this.nonReads.get(i).getChromosome() == chromosome && this.nonReads.get(i).getStrand() == strand)
-    		{
-    			//TODO
-    			
-    			success = false;
-    			break;
-    		}
-    	}
+	    	if(this.nonReads.get(i).getName().equals(chromosome))
+	    	{
+	    		success = !this.nonReads.get(i).search(start, end, strand);
+	    		
+	    		if(!success)
+	    			this.counterBackground++;
+	    		
+	    		break;
+	    	}
+    	}	
     	
     	return success;
     }
