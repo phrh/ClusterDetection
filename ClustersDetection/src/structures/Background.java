@@ -14,6 +14,7 @@ package structures;
 
 import java.util.Vector;
 
+
 /**
  * 
  * @author Eng. Paula Reyes, Ph.D. -- M.Sc. Eng. Carlos Sierra
