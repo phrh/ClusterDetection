@@ -121,7 +121,7 @@ public class Background {
 			{
 				if(readsPositive.get(i).getStrand().equals(strand))
 				{
-					if((start <= readsPositive.get(i).getStart() && end >= readsPositive.get(i).getEnd()) && (readsPositive.get(i).getStart() <= start && readsPositive.get(i).getEnd() >= end))
+					if((start <= readsPositive.get(i).getStart() && end >= readsPositive.get(i).getEnd()) || (readsPositive.get(i).getStart() <= start && readsPositive.get(i).getEnd() >= end))
 					{
 						return true;
 					}

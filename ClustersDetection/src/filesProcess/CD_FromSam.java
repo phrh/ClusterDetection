@@ -136,7 +136,7 @@ public class CD_FromSam extends Thread
             BufferedReader br = new BufferedReader(new FileReader(file));
             
             //LOG: Describe initial steps
-            System.out.println("Processing...");            log += "Processing...\n";
+            System.out.println("Wellcome to CLIP-seq Cluster Detection \nProcessing...");            log += "Processing...\n";
             System.out.println("Separate lines...");        log += "Separate lines...\n";
             System.out.println("Start..."); 	            log += "Start...\n";
             
@@ -399,6 +399,7 @@ public class CD_FromSam extends Thread
             log += "Closing file without errors...\n";
         }
 	
+        this.nonReads = null;
         System.gc(); //Call to Garbage Collector
         
         //Get execution time until this point
@@ -498,11 +499,11 @@ public class CD_FromSam extends Thread
             	// ExperimentID   Strand   Chromosome  Start  QMap  CIGAR  -  -  -  Sequence Quality  -  -  NumberMutations
                 currentLine = line.split("\t"); //Split the read (line in columns) separate by tabs
             	
-                chromosome = currentLine[0]; //Parse the value of start position of current read
+                chromosome = currentLine[0];  //Parse the value of start position of current read
                 strand = currentLine[5]; //Parse the value of start position of current read
                 start = Integer.parseInt(currentLine[1]); //Parse the value of start position of current read
                 end = Integer.parseInt(currentLine[2]); //Parse the value of start position of current read
-                score = Integer.parseInt(currentLine[2]); //Parse the value of start position of current read
+                score = Integer.parseInt(currentLine[4]); //Parse the value of start position of current read
                 
                 int i = 0;
                 
