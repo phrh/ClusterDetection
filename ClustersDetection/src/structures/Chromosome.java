@@ -179,7 +179,6 @@ public class Chromosome extends Thread
             
             Functions.saveInFile(folderResults + "/Log.txt", "\nFinish chromosome");
             
-            System.out.println("\nReady  " + this.name);
             this.interrupt();
         } 
         catch (InterruptedException ex) 
