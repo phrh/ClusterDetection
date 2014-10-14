@@ -14,11 +14,9 @@
 package structures;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -786,7 +784,7 @@ public class Cluster extends Thread{
      * 
      * @param position 
      */
-    public void compareSNP(int position, String startPath, String otherPath)
+    public void compareSNP(int position)
     {
         if(position >= this.minPosition && position < this.maxPosition)
     	{
@@ -799,42 +797,6 @@ public class Cluster extends Thread{
     			{
     				this.mutations[i][position - this.minPosition] = 0;
     			}
-    			
-    			if(position == this.minPosition)
-    			{
-    				File fileSNPdis = new File(startPath);
-    				FileWriter fwSNPdis;
-    				
-    				try 
-    				{
-    					fwSNPdis = new FileWriter(fileSNPdis.getAbsoluteFile(), true);
-    					BufferedWriter bwSNP = new BufferedWriter(fwSNPdis);
-    					bwSNP.write(this.toString_BED("0.0"));
-    					bwSNP.close();
-    				} 
-    				catch (IOException e) 
-    				{
-    					e.printStackTrace();
-    				}
-    			}
-    			else
-    			{
-    				File fileoSNPdis = new File(otherPath);
-    				FileWriter fwoSNPdis;
-				
-    				try 
-    				{
-    					fwoSNPdis = new FileWriter(fileoSNPdis.getAbsoluteFile(), true);
-    					BufferedWriter bwSNP = new BufferedWriter(fwoSNPdis);
-    					bwSNP.write(this.toString_BED("1.1"));
-    					bwSNP.close();
-    				} 
-    				catch (IOException e) 
-    				{
-    					e.printStackTrace();
-    				}
-    			}
-    			
     		}
     	}
 	}

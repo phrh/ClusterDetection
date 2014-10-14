@@ -14,7 +14,6 @@ package structures;
 
 import java.util.Vector;
 
-
 /**
  * 
  * @author Eng. Paula Reyes, Ph.D. -- M.Sc. Eng. Carlos Sierra
@@ -56,7 +55,8 @@ public class Background {
 	/**
 	 * @return the readsPositive
 	 */
-	public Vector<Read> getReadsPositive() {
+	public Vector<Read> getReadsPositive() 
+	{
 		return readsPositive;
 	}
 
@@ -64,7 +64,8 @@ public class Background {
 	/**
 	 * @param readsPositive the readsPositive to set
 	 */
-	public void setReadsPositive(Vector<Read> readsPositive) {
+	public void setReadsPositive(Vector<Read> readsPositive) 
+	{
 		this.readsPositive = readsPositive;
 	}
 
@@ -72,7 +73,8 @@ public class Background {
 	/**
 	 * @return the readsNegative
 	 */
-	public Vector<Read> getReadsNegative() {
+	public Vector<Read> getReadsNegative() 
+	{
 		return readsNegative;
 	}
 
@@ -80,7 +82,8 @@ public class Background {
 	/**
 	 * @param readsNegative the readsNegative to set
 	 */
-	public void setReadsNegative(Vector<Read> readsNegative) {
+	public void setReadsNegative(Vector<Read> readsNegative) 
+	{
 		this.readsNegative = readsNegative;
 	}
 

@@ -51,10 +51,7 @@ public class SetCluster extends Thread {
     private boolean saveDetails; //
     private String fastaPath; //
     private String snpPath; //
-    private String startPositionPath; //
-    private String startMutationPath; //
-    private String otherPositionPath; //
-    private String otherMutationPath; //
+    
     
     private String log = "";
     
@@ -96,10 +93,10 @@ public class SetCluster extends Thread {
         this.chromosome = chromosome;
         this.fastaPath = fastaPath;
         this.snpPath = snpPath;
-        this.startPositionPath = startPositionPath;
-        this.startMutationPath = startMutationPath;
-        this.otherPositionPath = otherPositionPath;
-        this.otherMutationPath = otherMutationPath;
+        //this.startPositionPath = startPositionPath;
+        //this.startMutationPath = startMutationPath;
+        //this.otherPositionPath = otherPositionPath;
+        //this.otherMutationPath = otherMutationPath;
     }
 
     
@@ -227,7 +224,7 @@ public class SetCluster extends Thread {
 	            
 	            if(bedFile.exists())
 	            {
-	            	File fileSNP = new File(this.startPositionPath);
+	            	/*File fileSNP = new File(this.startPositionPath);
 		        	FileWriter fwSNP;
 		            if (!fileSNP.exists()) 
 		            {
@@ -290,17 +287,17 @@ public class SetCluster extends Thread {
 		                    System.exit(0);
 		                }
 		            }
-		        	
+		        	*/
 		            
 	                BufferedReader br = new BufferedReader(new FileReader(bedFile));
 	                line = br.readLine(); //Header
 	                line = br.readLine(); //First line
 	
-	                fwSNP = new FileWriter(fileSNP.getAbsoluteFile(), true);
-	    			BufferedWriter bwSNP = new BufferedWriter(fwSNP);
+	                //fwSNP = new FileWriter(fileSNP.getAbsoluteFile(), true);
+	    			//BufferedWriter bwSNP = new BufferedWriter(fwSNP);
 	    			
-	    			fwoSNP = new FileWriter(fileoSNP.getAbsoluteFile(), true);
-	    			BufferedWriter bwoSNP = new BufferedWriter(fwoSNP);
+	    			//fwoSNP = new FileWriter(fileoSNP.getAbsoluteFile(), true);
+	    			//BufferedWriter bwoSNP = new BufferedWriter(fwoSNP);
 	                
 	    			while(line != null)
 	                {
@@ -317,24 +314,24 @@ public class SetCluster extends Thread {
 	                    	
 		                    if(i >= 0 && i < this.set.size())
 		                    {
-		                        this.set.get(i).compareSNP(positionEnd, this.startMutationPath, this.otherMutationPath);
+		                        this.set.get(i).compareSNP(positionEnd);
 		                        
-		                        if(this.set.get(i).getMinPosition() == positionEnd)
+		                        /*if(this.set.get(i).getMinPosition() == positionEnd)
 		                        {
 		                        	bwSNP.write(this.set.get(i).toString_BED("0"));
 		                        }
 		                        else
 		                        {
 		                        	bwoSNP.write(this.set.get(i).toString_BED("1"));  //TODO 
-		                        }
+		                        }*/
 		                    }
 	                    }
 		                    
 	                    line = br.readLine(); //Next line
 	                }
 	                
-	    			bwSNP.close();
-	    			bwoSNP.close();
+	    			//bwSNP.close();
+	    			//bwoSNP.close();
 	                br.close();
 	            }    
 	        } 

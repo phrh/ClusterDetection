@@ -51,6 +51,14 @@ public class CD_FromSam extends Thread
     private int counterSNP = 0; //Amount of SNPs that binding with clusters
     private int counterBackground = 0;
     
+    //Ranking parameters
+    private int minScore = 0;
+    private double minDensity = 0.0;
+    
+    
+    int counterTest = 0;  //TODO just prove flexibility to NM
+    
+    
     /**
      * Zero-parameters constructor
      */
@@ -99,16 +107,16 @@ public class CD_FromSam extends Thread
         
         
         //Read-sequence information
-        int start; //Start position of read
-        int end; //End position of read
-        int seqLenght; //Length of read
-        String cigar; //CIGAR of read
-        String strand; //Strand of read
-        String sequence; //Sequence of read
-        String quality; //Quality of read
-        int qmap; //Quality level of mapped process
-        int numberMutations; //Number of mutations in read
-        String chromosome; //Chromosome of read
+        int start = 0; //Start position of read
+        int end = 0; //End position of read
+        int seqLenght = 0; //Length of read
+        String cigar = ""; //CIGAR of read
+        String strand = "*"; //Strand of read
+        String sequence = ""; //Sequence of read
+        String quality = ""; //Quality of read
+        int qmap = 0; //Quality level of mapped process
+        int numberMutations = 0; //Number of mutations in read
+        String chromosome = "Undef"; //Chromosome of read
         
         
         //Experimental data set information (Use for statistics analysis)
@@ -121,6 +129,8 @@ public class CD_FromSam extends Thread
         int sequences_bg = 0; //Number of sequences find in background
         int[] occurrences = new int[4]; //Occurrences of the strands
 
+        
+        System.out.println("=====Wellcome to CLIP-seq Cluster Detection===== \n\nProcessing...");   log += "Processing...\n";
         
         //Load background
         if(!noisePath.toLowerCase().equals("none"))
@@ -136,7 +146,6 @@ public class CD_FromSam extends Thread
             BufferedReader br = new BufferedReader(new FileReader(file));
             
             //LOG: Describe initial steps
-            System.out.println("Wellcome to CLIP-seq Cluster Detection \nProcessing...");            log += "Processing...\n";
             System.out.println("Separate lines...");        log += "Separate lines...\n";
             System.out.println("Start..."); 	            log += "Start...\n";
             
@@ -214,7 +223,14 @@ public class CD_FromSam extends Thread
             }
             
             
+            //When there're no info of chromosomes on SAM format, load some default data
+            if(this.chromosomes.size() == 0)
+            {
+            	this.createChromosomes(folderResults, minSequences, minLength, fastaPath, snpPath);
+            }
+            
             System.gc(); // Call Garbage Collector
+            
             
             
             //Next step: Process reads in file
@@ -230,7 +246,7 @@ public class CD_FromSam extends Thread
                 contTotals++; //Increase the amount of reads in file
                 
                 //Define strand type
-                if(currentLine[1].equals("0"))
+                if(currentLine[1].equals("0") || currentLine[1].equals("256"))
                 {
                     occurrences[0]++;
                     strand = "+";
@@ -242,7 +258,7 @@ public class CD_FromSam extends Thread
                         strand = "*";
                     }
                     else
-                        if(currentLine[1].equals("16"))
+                        if(currentLine[1].equals("16") || currentLine[1].equals("272"))
                         {
                             occurrences[2]++;
                             strand = "-";
@@ -302,7 +318,19 @@ public class CD_FromSam extends Thread
                         
                         quality = currentLine[10]; //Quality of current read
                         qmap = Integer.parseInt(currentLine[4]); //Quality of mapped of current read
-                        numberMutations = Integer.parseInt(currentLine[13].split(":")[2]); //Number of mutations of current read
+                        
+                        //Number of mutations of current read, flexible for TopHap, Bowtie, or anyone
+                        for(int i = 11; i < currentLine.length; i++)
+                        {
+                        	if(currentLine[i].split(":")[0].equals("NM")) //NM is the indicator for this parameter
+                        	{
+                        		numberMutations = Integer.parseInt(currentLine[i].split(":")[2]);
+                        		counterTest++;
+                        		break;
+                        	}
+                        }
+                         
+                        
                         cigar = currentLine[5]; //CIGAR of current read
 
                         //Move through defined chromosomes
@@ -406,7 +434,7 @@ public class CD_FromSam extends Thread
         double elapsedTimeInSec;
         elapsedTimeInSec = (System.nanoTime() - startTime) * 1.0e-9;
         System.out.println("\n\nElapsed Time: " + elapsedTimeInSec + " seconds\n\nStart Clusters Detection");
-        log += "\n\nElapsed Time: " + elapsedTimeInSec + " seconds\n\nStart Clusters Detection";
+        log += "\n\nElapsed Time: " + elapsedTimeInSec + " seconds\n\nProfiling clusters...";
         
         
         //Process choromosomes in parallel
@@ -422,11 +450,12 @@ public class CD_FromSam extends Thread
             this.chromosomes.get(l).join(); //Wait to all chromosomes finish clusters detection 
         } 
         
+        
         //Get execution time until this point
         elapsedTimeInSec = (System.nanoTime() - startTime) * 1.0e-9;
         System.out.println("\nElapsed time in process: " + elapsedTimeInSec + " seconds");
-    	System.out.println("Saving clusters in formats: txt, bed, sam");
-    	log += "\n\nElapsed time in process: " + elapsedTimeInSec + " seconds\n\nSaving clusters in formats: txt, bed, sam";
+    	System.out.println("Saving clusters");
+    	log += "\n\nElapsed time in process: " + elapsedTimeInSec + " seconds\n\nSaving clusters";
     	
         //Start thread that saves general file clusters
        	start();
@@ -449,16 +478,21 @@ public class CD_FromSam extends Thread
         log += "\n\nElapsed Total Time: " + elapsedTimeInSec + " seconds";
         
         
+        System.out.println("\n\n\nCounter " + counterTest);  //TODO
+        
+        
         //Create ranking of clusters 
         //this.createRanking(amount);
         
         //Get trials to make cross-validation: 10 subsets for training, 10 subsets for testing
+        // TODO
+        /*
         this.getTrials(window);
         double tempTime = elapsedTimeInSec;
         elapsedTimeInSec = (System.nanoTime() - startTime) * 1.0e-9;
         System.out.println("\n\nTrials Building Time: " + (elapsedTimeInSec - tempTime) + " seconds");
         log += "\n\nTrials Building Time: " + (elapsedTimeInSec - tempTime) + " seconds";
-        
+        */
         
         //Save log data in a file
         Functions.saveInFile(fileLog, log);
@@ -468,6 +502,36 @@ public class CD_FromSam extends Thread
         
         //Start priority to motif search
         //Priority priority = new Priority(setup);
+    }
+    
+    
+    public void createChromosomes(String folderResults, int minSequences, int minLength, String fastaPath, String snpPath)
+    {
+    	this.chromosomes.add(new Chromosome("chr1", 249250621, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr2", 243199373, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr3", 198022430, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr4", 191154276, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr5", 180915260, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr6", 171115067, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr7", 159138663, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr8", 146364022, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr9", 141213431, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr10", 135534747, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr11", 135006516, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr12", 133851895, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr13", 115169878, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr14", 107349540, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr15", 102531392, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr16", 90354753, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr17", 81195210, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr18", 78077248, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr19", 59128983, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr20", 63025520, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr21", 48129895, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chr22", 51304566, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chrX", 155270560, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chrY", 59373566, folderResults, minSequences, minLength, fastaPath, snpPath));
+    	this.chromosomes.add(new Chromosome("chrZ", 16571, folderResults, minSequences, minLength, fastaPath, snpPath));
     }
     
     
@@ -509,7 +573,7 @@ public class CD_FromSam extends Thread
                 
                 if(score >= this.bg_score)
                 {
-	                for(i = 0; i < this.nonReads.size(); i++)
+	            	for(i = 0; i < this.nonReads.size(); i++)
 	                {
 	                	if(this.nonReads.get(i).getName().equals(chromosome))
 	                	{
@@ -554,7 +618,9 @@ public class CD_FromSam extends Thread
 	    		success = !this.nonReads.get(i).search(start, end, strand);
 	    		
 	    		if(!success)
+	    		{
 	    			this.counterBackground++;
+	    		}
 	    		
 	    		break;
 	    	}
@@ -1053,7 +1119,7 @@ public class CD_FromSam extends Thread
     	
     	for(int i = 0; i < 10; i++)
     	{
-    		saveRankings(i + 1, i * subset, (i * subset) + (subset - 1), window);
+    		saveTrials(i + 1, i * subset, (i * subset) + (subset - 1), window);
     	}
     	
     	//saveRankings(1, 0, length, window);
@@ -1067,12 +1133,13 @@ public class CD_FromSam extends Thread
      * @param end
      * @param window
      */
-    public void saveRankings(int set, int start, int end, int window)
+    public void saveTrials(int set, int start, int end, int window)
     {
     	String fileFastaTraining = folderResults + "/FASTA/trial_" + set + "_training.fasta";
     	String filePriorTraining = folderResults + "/PRIORS/trial_" + set + "_training.prior";
     	String fileFastaTesting = folderResults + "/FASTA/trial_" + set + "_testing.fasta";
     	String filePriorTesting = folderResults + "/PRIORS/trial_" + set + "_testing.prior";
+    	String fileFastaTestingNeg = folderResults + "/FASTA/trial_" + set + "_testing_negative.fasta";
     	
     	File fileSaveFastaTraining = new File(fileFastaTraining);
     	FileWriter fwFastaTraining;
@@ -1102,6 +1169,22 @@ public class CD_FromSam extends Thread
             {
                 Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
                 System.out.println("\n\nFile " + fileFastaTesting);
+                System.exit(0);
+            }
+        }
+        
+        File fileSaveFastaTestingNeg = new File(fileFastaTestingNeg);
+    	FileWriter fwFastaTestingNeg;
+        if (!fileSaveFastaTestingNeg.exists()) 
+        {
+            try 
+            {
+                fileSaveFastaTestingNeg.createNewFile();
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("\n\nFile " + fileFastaTestingNeg);
                 System.exit(0);
             }
         }
@@ -1148,6 +1231,9 @@ public class CD_FromSam extends Thread
 			fwFastaTesting = new FileWriter(fileSaveFastaTesting.getAbsoluteFile(), true);
 			BufferedWriter bwFastaTesting = new BufferedWriter(fwFastaTesting);
 			
+			fwFastaTestingNeg = new FileWriter(fileSaveFastaTesting.getAbsoluteFile(), true);
+			BufferedWriter bwFastaTestingNeg = new BufferedWriter(fwFastaTestingNeg);
+			
 			fwPriorTraining = new FileWriter(fileSavePriorTraining.getAbsoluteFile(), true);
 			BufferedWriter bwPriorTraining = new BufferedWriter(fwPriorTraining);
 			
@@ -1163,6 +1249,9 @@ public class CD_FromSam extends Thread
 		    		{
 		    			bwFastaTesting.write(this.ranking.get(l).toString_Fasta());
 						bwPriorTesting.write(this.ranking.get(l).toString_Prior(window));
+						
+						//Negative set
+						bwFastaTestingNeg.write(getNegative(this.ranking.get(l)));
 					} 
 		    		catch (IOException e) 
 		    		{
@@ -1187,6 +1276,7 @@ public class CD_FromSam extends Thread
 	    	bwPriorTraining.close();
 	    	
 	    	bwFastaTesting.close();
+	    	bwFastaTestingNeg.close();
 	    	bwPriorTesting.close();
 		} 
         catch (IOException e1) 
@@ -1198,26 +1288,98 @@ public class CD_FromSam extends Thread
     
     /**
      * 
+     * @param cluster
+     * @return
+     */
+    public String getNegative(Cluster cluster)
+    {
+    	String negative = "";
+    	String seq = cluster.getSequence();
+    	double[] weights = new double[5];
+    	
+    	for(int i = 0; i < seq.length(); i++)
+    	{
+    		switch(seq.charAt(i))
+    		{
+    			case 'A':	weights[0] += 1.0;	break;
+    			case 'C':	weights[1] += 1.0;	break;
+    			case 'G':	weights[2] += 1.0;	break;
+    			case 'T':	weights[3] += 1.0;	break;
+    			case 'N':	weights[4] += 1.0;	break;
+    		}
+    	}
+    	
+    	for(int i = 0; i < 5; i++)
+    	{
+    		weights[i] /= (double) seq.length();
+    	}
+    	
+    	for(int i = 1; i < 5; i++)
+    	{
+    		weights[i] += weights[i - 1];
+    	}
+    	
+    	double roulette;
+    	Random rd = new Random();
+    	
+    	for(int i = 0; i < seq.length(); i++)
+    	{
+    		roulette = rd.nextDouble();
+    		
+    		if(roulette < weights[0])
+    		{
+    			negative += "A";
+    		}
+    		else
+    		{
+    			if(roulette < weights[1])
+        		{
+        			negative += "C";
+        		}
+        		else
+        		{
+        			if(roulette < weights[2])
+            		{
+            			negative += "G";
+            		}
+            		else
+            		{
+            			if(roulette < weights[3])
+                		{
+                			negative += "T";
+                		}
+                		else
+                		{
+                			negative += "N";
+                		}
+            		}
+        		}
+    		}
+    	}
+    	
+    	return negative;
+    }
+    
+    
+    /**
+     * 
      * @param amount
      */
     public void createRanking(int amount)
     {
     	int temp = 0;
-    	int score = 0;
     	
     	for(int i = 0; i < this.chromosomes.size(); i++)
     	{
     		for(int j = 0; j < this.chromosomes.get(i).getClustersFilter().getSet().size(); j++)
     		{
-    			score =  this.chromosomes.get(i).getClustersFilter().getSet().get(j).getMutationsRanking();
-    			temp = findIndexRanking(score);
-    			this.ranking.add(temp, this.chromosomes.get(i).getClustersFilter().getSet().get(j));
+    			if(this.chromosomes.get(i).getClustersFilter().getSet().get(j).getMutationsRanking() >= this.minScore ||
+    				this.chromosomes.get(i).getClustersFilter().getSet().get(j).getDensityRanking() >= this.minDensity)
+    			{
+    				temp = findIndexRanking(this.chromosomes.get(i).getClustersFilter().getSet().get(j).getMutationsRanking());
+    				this.ranking.add(temp, this.chromosomes.get(i).getClustersFilter().getSet().get(j));
+    			}
     		}
-    	}
-    	
-    	for(int i = this.ranking.size() - amount - 1; i >= 0; i--)
-    	{
-    		this.ranking.remove(i);
     	}
     	
     	this.randomDouble();
