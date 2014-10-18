@@ -56,9 +56,6 @@ public class CD_FromSam extends Thread
     private double minDensity = 0.0;
     
     
-    int counterTest = 0;  //TODO just prove flexibility to NM
-    
-    
     /**
      * Zero-parameters constructor
      */
@@ -325,7 +322,6 @@ public class CD_FromSam extends Thread
                         	if(currentLine[i].split(":")[0].equals("NM")) //NM is the indicator for this parameter
                         	{
                         		numberMutations = Integer.parseInt(currentLine[i].split(":")[2]);
-                        		counterTest++;
                         		break;
                         	}
                         }
@@ -447,9 +443,13 @@ public class CD_FromSam extends Thread
         
         for(int l = 0; l < this.chromosomes.size(); l++)
         {
-            this.chromosomes.get(l).join(); //Wait to all chromosomes finish clusters detection 
+            this.chromosomes.get(l).join(); //Wait to all chromosomes finish clusters detection
+            this.minScore = this.chromosomes.get(l).getMaxScore() > this.minScore ? this.chromosomes.get(l).getMaxScore() : this.minScore; 
+            this.minDensity = this.chromosomes.get(l).getMaxDensity() > this.minDensity ? this.chromosomes.get(l).getMaxDensity() : this.minDensity;
         } 
         
+        this.minScore *= 0.75;
+        this.minDensity *= 0.75;
         
         //Get execution time until this point
         elapsedTimeInSec = (System.nanoTime() - startTime) * 1.0e-9;
@@ -478,21 +478,16 @@ public class CD_FromSam extends Thread
         log += "\n\nElapsed Total Time: " + elapsedTimeInSec + " seconds";
         
         
-        System.out.println("\n\n\nCounter " + counterTest);  //TODO
-        
-        
         //Create ranking of clusters 
-        //this.createRanking(amount);
+        this.createRanking();
         
         //Get trials to make cross-validation: 10 subsets for training, 10 subsets for testing
-        // TODO
-        /*
+        // 
         this.getTrials(window);
         double tempTime = elapsedTimeInSec;
         elapsedTimeInSec = (System.nanoTime() - startTime) * 1.0e-9;
         System.out.println("\n\nTrials Building Time: " + (elapsedTimeInSec - tempTime) + " seconds");
         log += "\n\nTrials Building Time: " + (elapsedTimeInSec - tempTime) + " seconds";
-        */
         
         //Save log data in a file
         Functions.saveInFile(fileLog, log);
@@ -1365,7 +1360,7 @@ public class CD_FromSam extends Thread
      * 
      * @param amount
      */
-    public void createRanking(int amount)
+    public void createRanking()
     {
     	int temp = 0;
     	

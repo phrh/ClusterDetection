@@ -38,6 +38,11 @@ public class Chromosome extends Thread
     private String folderResults;
     private int minLength; 
     
+    //Information for rankings
+    private int maxScore = 0;
+    private double maxDensity = 0.0;
+    
+    
     /**
      * Zero-parameters constructor of the class
      */
@@ -273,5 +278,25 @@ public class Chromosome extends Thread
         while (min < max);
 			
         return index;
+    }
+    
+    
+    /**
+     * 
+     * @return
+     */
+    public int getMaxScore()
+    {
+    	return this.maxScore;
+    }
+    
+    
+    /**
+     * 
+     * @return
+     */
+    public double getMaxDensity()
+    {
+    	return this.maxDensity;
     }
 }
