@@ -110,11 +110,10 @@ public class RBP_Project {
                 			File fastaPathF = new File(fastaPath);
                             if (!fastaPathF.exists())
                             {
-                            	System.out.println("FASTA folder not exists.");
+                            	System.out.println("Genome folder not exists.");
                             	System.exit(0);
                             }
-                                
-                		}
+                        }
                 		break;
                 		case "SNP_Folder":
                 		{
@@ -127,7 +126,7 @@ public class RBP_Project {
                             }
                 		}
                 		break;
-                		case "Noise_Reads":
+                		case "Background":
                 		{
                 			noisePath = field_value[1];
                 		}

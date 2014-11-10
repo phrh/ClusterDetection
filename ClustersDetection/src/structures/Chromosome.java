@@ -1,5 +1,5 @@
 /*
-# CLIP-seq CLuster Detection - Tool to detect clusters of an experimental data set of RBP obtained by CLIP-seq protocol.
+CLIP-seq CLuster Detection - Tool to detect clusters of an experimental data set of RBP obtained by CLIP-seq protocol.
 #
 # Created by Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra on August 2014.
 # Copyright (c) 2014 Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra. Universidad Antonio Narino. All rights reserved.
@@ -37,10 +37,6 @@ public class Chromosome extends Thread
     //Parameters for process
     private String folderResults;
     private int minLength; 
-    
-    //Information for rankings
-    private int maxScore = 0;
-    private double maxDensity = 0.0;
     
     
     /**
@@ -280,23 +276,5 @@ public class Chromosome extends Thread
         return index;
     }
     
-    
-    /**
-     * 
-     * @return
-     */
-    public int getMaxScore()
-    {
-    	return this.maxScore;
-    }
-    
-    
-    /**
-     * 
-     * @return
-     */
-    public double getMaxDensity()
-    {
-    	return this.maxDensity;
-    }
+
 }

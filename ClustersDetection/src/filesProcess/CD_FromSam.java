@@ -419,8 +419,8 @@ public class CD_FromSam extends Thread
         } 
         finally 
         {
-            System.out.println("Closing read's file without errors...");
-            log += "Closing file without errors...\n";
+            System.out.println("Closing dataset's file without errors...");
+            log += "Closing dataset's without errors...\n";
         }
 	
         this.nonReads = null;
@@ -440,16 +440,24 @@ public class CD_FromSam extends Thread
             Thread.sleep(500); //Delay to start next chromosome clusters-detection. Try to avoid concurrence problems.
         }    
         
+        int tempScore;
+        double tempDensity;
         
         for(int l = 0; l < this.chromosomes.size(); l++)
         {
             this.chromosomes.get(l).join(); //Wait to all chromosomes finish clusters detection
-            this.minScore = this.chromosomes.get(l).getMaxScore() > this.minScore ? this.chromosomes.get(l).getMaxScore() : this.minScore; 
-            this.minDensity = this.chromosomes.get(l).getMaxDensity() > this.minDensity ? this.chromosomes.get(l).getMaxDensity() : this.minDensity;
+            
+            tempScore = this.chromosomes.get(l).getClustersFilter().getMaxScore();
+            tempDensity = this.chromosomes.get(l).getClustersFilter().getMaxDensity();
+            
+            this.minScore = tempScore > this.minScore ? tempScore : this.minScore; 
+            this.minDensity = tempDensity > this.minDensity ? tempDensity : this.minDensity;
         } 
         
         this.minScore *= 0.75;
         this.minDensity *= 0.75;
+        
+        System.out.println("Score: " + this.minScore + "\tDesnsity:" + this.minDensity + "\n");
         
         //Get execution time until this point
         elapsedTimeInSec = (System.nanoTime() - startTime) * 1.0e-9;
@@ -457,7 +465,7 @@ public class CD_FromSam extends Thread
     	System.out.println("Saving clusters");
     	log += "\n\nElapsed time in process: " + elapsedTimeInSec + " seconds\n\nSaving clusters";
     	
-        //Start thread that saves general file clusters
+    	//Start thread that saves general file clusters
        	start();
     	join();
     	
@@ -478,8 +486,8 @@ public class CD_FromSam extends Thread
         log += "\n\nElapsed Total Time: " + elapsedTimeInSec + " seconds";
         
         
-        //Create ranking of clusters 
-        this.createRanking();
+        
+        
         
         //Get trials to make cross-validation: 10 subsets for training, 10 subsets for testing
         // 
@@ -1094,6 +1102,56 @@ public class CD_FromSam extends Thread
     
     
     /**
+     * This method is used to save the clusters information in a file with SAM format.
+     */
+    public void saveRanking()
+    {
+    	String fileRanking = folderResults + "/Ranking.bed";
+    	
+    	File fileSaveRanking = new File(fileRanking);
+    	FileWriter fwRanking;
+        if (!fileSaveRanking.exists()) 
+        {
+            try 
+            {
+                fileSaveRanking.createNewFile();
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("\n\nFile " + fileRanking);
+                System.exit(0);
+            }
+        }
+        
+        try 
+        {
+			fwRanking = new FileWriter(fileSaveRanking.getAbsoluteFile(), true);
+			BufferedWriter bwRanking = new BufferedWriter(fwRanking);
+			
+			
+	    	for(int l = 0; l < this.ranking.size(); l++)
+	        {    
+	    		try 
+	    		{
+					bwRanking.write(this.ranking.get(l).toString_BED("Ranking." + (l + 1)) + "\n");
+				} 
+	    		catch (IOException e) 
+	    		{
+					e.printStackTrace();
+				}
+	            
+	        }
+	    	
+	    	bwRanking.close();
+	    } 
+        catch (IOException e1) 
+        {
+			e1.printStackTrace();
+		}
+    }
+    
+    /**
      * 
      * @param window
      */
@@ -1378,6 +1436,8 @@ public class CD_FromSam extends Thread
     	}
     	
     	this.randomDouble();
+    	
+    	this.saveRanking();
     }
     
     
@@ -1387,7 +1447,7 @@ public class CD_FromSam extends Thread
     	int max = this.ranking.size(); //Current upper limit of search segment
     	int size = this.ranking.size(); //Size of the cluster
  		int middle; //Split point of search segment
- 		int index = -1;
+ 		int index = 0;
 			
         do //Use binary search to find the respective index
         {
@@ -1410,6 +1470,18 @@ public class CD_FromSam extends Thread
     @Override
     public void run()
     {
+    	Thread rank = new Thread ()
+    	{
+    		@Override
+    		public void run()
+    		{
+    			createRanking();
+    		}
+    	};
+    	
+    	rank.start();
+    	
+    	
     	Thread txt = new Thread ()
     	{
     		@Override
@@ -1462,7 +1534,10 @@ public class CD_FromSam extends Thread
     	 */
     	try 
     	{
-			txt.join();
+			rank.join();
+			rank.interrupt();
+    		
+    		txt.join();
 			txt.interrupt();
 			
 			bedT.join();

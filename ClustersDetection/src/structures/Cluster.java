@@ -54,6 +54,10 @@ public class Cluster extends Thread{
     private int deletions[][] = null; //Deletions vector by nucleotide base (A, C, G, T)
 
     
+    private int mutationsRanking = 0;
+    private double densityRanking = 0.0;
+    
+    
     private String logSNP = "";
     
     
@@ -513,8 +517,6 @@ public class Cluster extends Thread{
 	    //Initialize vectors
 	    int lengthSequence = sequence.length() != 0 ? sequence.length() : 1;
 	    
-	    //System.out.println("Cluster Profile: Sequence " + this.sequence + "\tLength " + lengthSequence);
-	    
 	    this.coverage = new int[lengthSequence];
 	    this.mutation = new int[lengthSequence];
 	    this.undefined = new int[lengthSequence];
@@ -555,228 +557,237 @@ public class Cluster extends Thread{
 	                if(i == cigar.length() || clusterIndex >= this.sequence.length() || sequenceIndex >= sequence_read.length())
 	                	break;
 	                
-	                if(cigar.charAt(k) == 'M')
+	                if(cigar.charAt(k) == 'N') //TODO
 	                {
-	                	length = Integer.parseInt(cigar.substring(i, k));
-	                    
-	                    
-	                    for(int l = 0; l < length; l++)
-	                    {
-	                    	if(clusterIndex >= this.sequence.length() || sequenceIndex >= sequence_read.length())
-	    	                	break;
-	                    	
-	                    	this.coverage[clusterIndex] += sequenceOcurrences;
-	                    	
-	                    	/**
-                    	 	 * 0: A - C
-                             * 1: A - G
-                             * 2: A - T
-                             * 3: C - A
-                             * 4: C - G
-                             * 5: C - T
-                             * 6: G - A
-                             * 7: G - C
-                             * 8: G - T
-                             * 9: T - A
-                             * 10: T - C
-                             * 11: T - G
-                            */
-	
-	                    	if(sequence_read.charAt(sequenceIndex) == 'N')
-                            {
-	                    		this.undefined[clusterIndex] += sequenceOcurrences;	
-	                    	}
-	                    	else
-	                    	{	
-	                    		if(this.sequence.charAt(clusterIndex) == 'A')
-	                            {	
-	                                if(sequence_read.charAt(sequenceIndex) == 'C')
-	                                {
-	                                	this.mutations[0][clusterIndex] += sequenceOcurrences;
-	                                	this.numberMutations += sequenceOcurrences;
-	    	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	    	                        }
-	                                else
-	                                {
-	                                    if(sequence_read.charAt(sequenceIndex) == 'G')
-	                                    {
-	                                    	this.mutations[1][clusterIndex] += sequenceOcurrences;
-	                                    	this.numberMutations += sequenceOcurrences;
-	        	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	        	                        }
-	                                    else
-	                                    {
-	                                        if(sequence_read.charAt(sequenceIndex) == 'T')
-	                                        {
-	                                        	this.mutations[2][clusterIndex] += sequenceOcurrences;
-	                                        	this.numberMutations += sequenceOcurrences;
-	            	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	            	                        }
-	                                    }
-	                                }
-	                            }
-	                            else
-	                            {	
-	                                if(this.sequence.charAt(clusterIndex) == 'C')
-	                                {	
-	                                    if(sequence_read.charAt(sequenceIndex) == 'A')
-	                                    {
-	                                    	this.mutations[3][clusterIndex] += sequenceOcurrences;
-	                                    	this.numberMutations += sequenceOcurrences;
-	        	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	        	                        }
-	                                    else
-	                                    {	
-	                                        if(sequence_read.charAt(sequenceIndex) == 'G')
-	                                        {
-	                                        	this.mutations[4][clusterIndex] += sequenceOcurrences;
-	                                        	this.numberMutations += sequenceOcurrences;
-	            	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	            	                        }
-	                                        else
-	                                        {	
-	                                            if(sequence_read.charAt(sequenceIndex) == 'T')
-	                                            {
-	                                            	this.mutations[5][clusterIndex] += sequenceOcurrences;
-	                                            	this.numberMutations += sequenceOcurrences;
-	                	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	                	                        }
-	                                        }
-	                                    }
-	                                }
-	                                else
-	                                {
-	                                    if(this.sequence.charAt(clusterIndex) == 'G')
-	                                    {
-	                                    	if(sequence_read.charAt(sequenceIndex) == 'A')
-	                                        {
-	                                    		this.mutations[6][clusterIndex] += sequenceOcurrences;
-	                                        	this.numberMutations += sequenceOcurrences;
-	            	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	            	                        }
-	                                        else
-	                                        {
-	                                            if(sequence_read.charAt(sequenceIndex) == 'C')
-	                                            {
-	                                            	this.mutations[7][clusterIndex] += sequenceOcurrences;
-	                                            	this.numberMutations += sequenceOcurrences;
-	                	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	                	                        }
-	                                            else
-	                                            {
-	                                                if(sequence_read.charAt(sequenceIndex) == 'T')
-	                                                {
-	                                                	this.mutations[8][clusterIndex] += sequenceOcurrences;
-	                                                	this.numberMutations += sequenceOcurrences;
-	                    	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	                    	                        }
-	                                            }
-	                                        }
-	                                    }
-	                                    else
-	                                    {  	
-	                                        if(this.sequence.charAt(clusterIndex) == 'T')
-	                                        {	
-	                                            if(sequence_read.charAt(sequenceIndex) == 'A')            
-	                                            {
-	                                            	this.mutations[9][clusterIndex] += sequenceOcurrences;
-	                                            	this.numberMutations += sequenceOcurrences;
-	                	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	                	                        }
-	                                            else
-	                                            { 	
-	                                                if(sequence_read.charAt(sequenceIndex) == 'C')
-	                                                {
-	                                                	this.mutations[10][clusterIndex] += sequenceOcurrences;
-	                                                	this.numberMutations += sequenceOcurrences;
-	                    	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	                    	                        }
-	                                                else
-	                                                {
-	                                                    if(sequence_read.charAt(sequenceIndex) == 'G')
-	                                                    {
-	                                                    	this.mutations[11][clusterIndex] += sequenceOcurrences;
-	                                                    	this.numberMutations += sequenceOcurrences;
-	                        	                            this.mutation[clusterIndex] += sequenceOcurrences;
-	                        	                        }
-	                                                }
-	                                        	}
-	                                        }
-	                                    }
-	                                }
-	                            }
-	                    	}
-	                        
-	                    	clusterIndex++; //Move in cluster 
-	                        sequenceIndex++; //Move in sequence
-	                    }
-	
-	                    i = k + 1; //Move initial index
+	                	
 	                }
 	                else
-	                {
-	                    if(cigar.charAt(k) == 'I')
-	                    {
-	                        length = Integer.parseInt(cigar.substring(i, k));
-	
-	                        for(int l = 0; l < length; l++)
-	                        {
-	                            switch(sequence_read.charAt(sequenceIndex))
+	                {	
+		                if(cigar.charAt(k) == 'M')
+		                {
+		                	length = Integer.parseInt(cigar.substring(i, k));
+		                    
+		                    
+		                    for(int l = 0; l < length; l++)
+		                    {
+		                    	if(clusterIndex >= this.sequence.length() || sequenceIndex >= sequence_read.length())
+		    	                	break;
+		                    	
+		                    	this.coverage[clusterIndex] += sequenceOcurrences;
+		                    	
+		                    	/**
+	                    	 	 * 0: A - C
+	                             * 1: A - G
+	                             * 2: A - T
+	                             * 3: C - A
+	                             * 4: C - G
+	                             * 5: C - T
+	                             * 6: G - A
+	                             * 7: G - C
+	                             * 8: G - T
+	                             * 9: T - A
+	                             * 10: T - C
+	                             * 11: T - G
+	                            */
+		
+		                    	if(sequence_read.charAt(sequenceIndex) == 'N')
 	                            {
-	                                case 'A': {  this.insertions[0][clusterIndex - 1] += sequenceOcurrences;  }
-	                                break;
-	                                case 'C': {  this.insertions[1][clusterIndex - 1] += sequenceOcurrences;  }
-	                                break;    
-	                                case 'G': {  this.insertions[2][clusterIndex - 1] += sequenceOcurrences;  }
-	                                break;    
-	                                case 'T': {  this.insertions[3][clusterIndex - 1] += sequenceOcurrences;  }
-	                                break;
-	                            }
-	
-	                            sequenceIndex++; //Move in sequence
-	                        }
-	
-	                        i = k + 1; //Move initial index
-	                    }
-	                    else
-	                    {
-	                        if(cigar.charAt(k) == 'D')
-	                        {
-	                            length = Integer.parseInt(cigar.substring(i, k));
-	                            
-	                            for(int l = 0; l < length; l++)
-	                            {
-	                            	this.coverage[clusterIndex] += sequenceOcurrences;
-	                            	
-	                            	switch(this.sequence.charAt(clusterIndex))
-	                                {
-	                                    case 'A': {  this.deletions[0][clusterIndex] += sequenceOcurrences;  }
-	                                    break;
-	                                    case 'C': {  this.deletions[1][clusterIndex] += sequenceOcurrences;  }
-	                                    break;    
-	                                    case 'G': {  this.deletions[2][clusterIndex] += sequenceOcurrences;  }
-	                                    break;    
-	                                    case 'T': {  this.deletions[3][clusterIndex] += sequenceOcurrences;  }
-	                                    break;
-	                                }
-	
-	                                clusterIndex++; //Move in cluster 
-	                                
-	                                if(clusterIndex >= this.sequence.length())
-	                                {
-	                                	break;
-	                                }	
-	                            }
-	
-	                            i = k + 1; //Move initial index
-	                        }
-	                    }
-	                }   
+		                    		this.undefined[clusterIndex] += sequenceOcurrences;	
+		                    	}
+		                    	else
+		                    	{	
+		                    		if(this.sequence.charAt(clusterIndex) == 'A')
+		                            {	
+		                                if(sequence_read.charAt(sequenceIndex) == 'C')
+		                                {
+		                                	this.mutations[0][clusterIndex] += sequenceOcurrences;
+		                                	this.numberMutations += sequenceOcurrences;
+		    	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		    	                        }
+		                                else
+		                                {
+		                                    if(sequence_read.charAt(sequenceIndex) == 'G')
+		                                    {
+		                                    	this.mutations[1][clusterIndex] += sequenceOcurrences;
+		                                    	this.numberMutations += sequenceOcurrences;
+		        	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		        	                        }
+		                                    else
+		                                    {
+		                                        if(sequence_read.charAt(sequenceIndex) == 'T')
+		                                        {
+		                                        	this.mutations[2][clusterIndex] += sequenceOcurrences;
+		                                        	this.numberMutations += sequenceOcurrences;
+		            	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		            	                        }
+		                                    }
+		                                }
+		                            }
+		                            else
+		                            {	
+		                                if(this.sequence.charAt(clusterIndex) == 'C')
+		                                {	
+		                                    if(sequence_read.charAt(sequenceIndex) == 'A')
+		                                    {
+		                                    	this.mutations[3][clusterIndex] += sequenceOcurrences;
+		                                    	this.numberMutations += sequenceOcurrences;
+		        	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		        	                        }
+		                                    else
+		                                    {	
+		                                        if(sequence_read.charAt(sequenceIndex) == 'G')
+		                                        {
+		                                        	this.mutations[4][clusterIndex] += sequenceOcurrences;
+		                                        	this.numberMutations += sequenceOcurrences;
+		            	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		            	                        }
+		                                        else
+		                                        {	
+		                                            if(sequence_read.charAt(sequenceIndex) == 'T')
+		                                            {
+		                                            	this.mutations[5][clusterIndex] += sequenceOcurrences;
+		                                            	this.numberMutations += sequenceOcurrences;
+		                	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		                	                        }
+		                                        }
+		                                    }
+		                                }
+		                                else
+		                                {
+		                                    if(this.sequence.charAt(clusterIndex) == 'G')
+		                                    {
+		                                    	if(sequence_read.charAt(sequenceIndex) == 'A')
+		                                        {
+		                                    		this.mutations[6][clusterIndex] += sequenceOcurrences;
+		                                        	this.numberMutations += sequenceOcurrences;
+		            	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		            	                        }
+		                                        else
+		                                        {
+		                                            if(sequence_read.charAt(sequenceIndex) == 'C')
+		                                            {
+		                                            	this.mutations[7][clusterIndex] += sequenceOcurrences;
+		                                            	this.numberMutations += sequenceOcurrences;
+		                	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		                	                        }
+		                                            else
+		                                            {
+		                                                if(sequence_read.charAt(sequenceIndex) == 'T')
+		                                                {
+		                                                	this.mutations[8][clusterIndex] += sequenceOcurrences;
+		                                                	this.numberMutations += sequenceOcurrences;
+		                    	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		                    	                        }
+		                                            }
+		                                        }
+		                                    }
+		                                    else
+		                                    {  	
+		                                        if(this.sequence.charAt(clusterIndex) == 'T')
+		                                        {	
+		                                            if(sequence_read.charAt(sequenceIndex) == 'A')            
+		                                            {
+		                                            	this.mutations[9][clusterIndex] += sequenceOcurrences;
+		                                            	this.numberMutations += sequenceOcurrences;
+		                	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		                	                        }
+		                                            else
+		                                            { 	
+		                                                if(sequence_read.charAt(sequenceIndex) == 'C')
+		                                                {
+		                                                	this.mutations[10][clusterIndex] += sequenceOcurrences;
+		                                                	this.numberMutations += sequenceOcurrences;
+		                    	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		                    	                        }
+		                                                else
+		                                                {
+		                                                    if(sequence_read.charAt(sequenceIndex) == 'G')
+		                                                    {
+		                                                    	this.mutations[11][clusterIndex] += sequenceOcurrences;
+		                                                    	this.numberMutations += sequenceOcurrences;
+		                        	                            this.mutation[clusterIndex] += sequenceOcurrences;
+		                        	                        }
+		                                                }
+		                                        	}
+		                                        }
+		                                    }
+		                                }
+		                            }
+		                    	}
+		                        
+		                    	clusterIndex++; //Move in cluster 
+		                        sequenceIndex++; //Move in sequence
+		                    }
+		
+		                    i = k + 1; //Move initial index
+		                }
+		                else
+		                {
+		                    if(cigar.charAt(k) == 'I')
+		                    {
+		                        length = Integer.parseInt(cigar.substring(i, k));
+		
+		                        for(int l = 0; l < length; l++)
+		                        {
+		                            switch(sequence_read.charAt(sequenceIndex))
+		                            {
+		                                case 'A': {  this.insertions[0][clusterIndex - 1] += sequenceOcurrences;  }
+		                                break;
+		                                case 'C': {  this.insertions[1][clusterIndex - 1] += sequenceOcurrences;  }
+		                                break;    
+		                                case 'G': {  this.insertions[2][clusterIndex - 1] += sequenceOcurrences;  }
+		                                break;    
+		                                case 'T': {  this.insertions[3][clusterIndex - 1] += sequenceOcurrences;  }
+		                                break;
+		                            }
+		
+		                            sequenceIndex++; //Move in sequence
+		                        }
+		
+		                        i = k + 1; //Move initial index
+		                    }
+		                    else
+		                    {
+		                        if(cigar.charAt(k) == 'D')
+		                        {
+		                            length = Integer.parseInt(cigar.substring(i, k));
+		                            
+		                            for(int l = 0; l < length; l++)
+		                            {
+		                            	this.coverage[clusterIndex] += sequenceOcurrences;
+		                            	
+		                            	switch(this.sequence.charAt(clusterIndex))
+		                                {
+		                                    case 'A': {  this.deletions[0][clusterIndex] += sequenceOcurrences;  }
+		                                    break;
+		                                    case 'C': {  this.deletions[1][clusterIndex] += sequenceOcurrences;  }
+		                                    break;    
+		                                    case 'G': {  this.deletions[2][clusterIndex] += sequenceOcurrences;  }
+		                                    break;    
+		                                    case 'T': {  this.deletions[3][clusterIndex] += sequenceOcurrences;  }
+		                                    break;
+		                                }
+		
+		                                clusterIndex++; //Move in cluster 
+		                                
+		                                if(clusterIndex >= this.sequence.length())
+		                                {
+		                                	break;
+		                                }	
+		                            }
+		
+		                            i = k + 1; //Move initial index
+		                        }
+		                    }
+		                }
+	                }
 	            }
 	        }   
 	    } 
 	    
 	    this.numberMutationsRevelant = this.numberMutations;
+	    this.calculateMutationsRanking();
+	    this.calculateDensityRanking();
 	}
 
 
@@ -1076,13 +1087,25 @@ public class Cluster extends Thread{
  	            while(line != null && !successful);
  		                
  				 if(successful)
- 					this.setSequence(sequence.toUpperCase()); 
+ 					this.setSequence(sequence.toUpperCase());
+ 				 else
+ 					System.out.println("ERROR: Can't find GENOME file in cluster's profile.");
  				 
  				 br.close();
-             }	 
+             }
+             else
+             {
+            	 System.out.println("ERROR: Can't find GENOME file in cluster's profile.");
+             }
          } 
-         catch (FileNotFoundException ex)   {} 
-         catch (IOException ex)   {}
+         catch (FileNotFoundException ex)   
+         {
+        	 System.out.println("ERROR: Can't find GENOME file in cluster's profile.");
+         } 
+         catch (IOException ex)   
+         {
+        	 System.out.println("ERROR: Can't gets GENOME file in cluster's profile.");
+         }
      }
     
     
@@ -1103,7 +1126,7 @@ public class Cluster extends Thread{
      * 
      * @return
      */
-    public int getMutationsRanking()
+    public void calculateMutationsRanking()
     {
     	int counter = 0;
     	
@@ -1112,14 +1135,19 @@ public class Cluster extends Thread{
     		counter += this.mutations[10][i];
     	}
     	
-    	return counter;
+    	this.mutationsRanking = counter;
+    }
+    
+    public int getMutationsRanking()
+    {
+    	return this.mutationsRanking;
     }
     
     /**
-     * 
+     * TODO calculate just one time
      * @return
      */
-    public int getDensityRanking()
+    public void calculateDensityRanking()
     {
     	int counterCoverage = 0;
     	int counterMutations = 0;
@@ -1135,7 +1163,12 @@ public class Cluster extends Thread{
     		counterMutations += this.mutations[10][i];
     	}
     	
-    	return counterMutations / counterCoverage;
+    	densityRanking = counterCoverage != 0 ? (double)counterMutations / (double)counterCoverage : 0.0;
+    }
+    
+    public double getDensityRanking()
+    {
+    	return this.densityRanking;
     }
     
     

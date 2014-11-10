@@ -56,6 +56,11 @@ public class SetCluster extends Thread {
     private String log = "";
     
     
+    //Information for rankings
+    private int maxScore = 0;
+    private double maxDensity = 0.0;
+    
+    
     /**
      * Zero-parameter constructor
      */
@@ -93,10 +98,6 @@ public class SetCluster extends Thread {
         this.chromosome = chromosome;
         this.fastaPath = fastaPath;
         this.snpPath = snpPath;
-        //this.startPositionPath = startPositionPath;
-        //this.startMutationPath = startMutationPath;
-        //this.otherPositionPath = otherPositionPath;
-        //this.otherMutationPath = otherMutationPath;
     }
 
     
@@ -224,82 +225,12 @@ public class SetCluster extends Thread {
 	            
 	            if(bedFile.exists())
 	            {
-	            	/*File fileSNP = new File(this.startPositionPath);
-		        	FileWriter fwSNP;
-		            if (!fileSNP.exists()) 
-		            {
-		                try 
-		                {
-		                	fileSNP.createNewFile();
-		                } 
-		                catch (IOException ex) 
-		                {
-		                    Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
-		                    System.out.println("\n\nFile " + fileSNP);
-		                    System.exit(0);
-		                }
-		            } 
-		            
-
-		            File fileoSNP = new File(this.otherPositionPath);
-		        	FileWriter fwoSNP;
-		            if (!fileSNP.exists()) 
-		            {
-		                try 
-		                {
-		                	fileoSNP.createNewFile();
-		                } 
-		                catch (IOException ex) 
-		                {
-		                    Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
-		                    System.out.println("\n\nFile " + fileoSNP);
-		                    System.exit(0);
-		                }
-		            } 
-
-		            
-		            File fileSNPdis = new File(this.startMutationPath);
-		        	if (!fileSNPdis.exists()) 
-		            {
-		                try 
-		                {
-		                	fileSNPdis.createNewFile();
-		                } 
-		                catch (IOException ex) 
-		                {
-		                    Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
-		                    System.out.println("\n\nFile " + fileSNPdis);
-		                    System.exit(0);
-		                }
-		            }
-		        	
-		        	File fileoSNPdis = new File(this.otherMutationPath);
-		        	if (!fileoSNPdis.exists()) 
-		            {
-		                try 
-		                {
-		                	fileoSNPdis.createNewFile();
-		                } 
-		                catch (IOException ex) 
-		                {
-		                    Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
-		                    System.out.println("\n\nFile " + fileoSNPdis);
-		                    System.exit(0);
-		                }
-		            }
-		        	*/
-		            
+	            			            
 	                BufferedReader br = new BufferedReader(new FileReader(bedFile));
 	                line = br.readLine(); //Header
 	                line = br.readLine(); //First line
 	
-	                //fwSNP = new FileWriter(fileSNP.getAbsoluteFile(), true);
-	    			//BufferedWriter bwSNP = new BufferedWriter(fwSNP);
-	    			
-	    			//fwoSNP = new FileWriter(fileoSNP.getAbsoluteFile(), true);
-	    			//BufferedWriter bwoSNP = new BufferedWriter(fwoSNP);
-	                
-	    			while(line != null)
+	                while(line != null)
 	                {
 	                    content = line.split("\t");
 	                    positionStart = Integer.parseInt(content[1]);
@@ -315,24 +246,13 @@ public class SetCluster extends Thread {
 		                    if(i >= 0 && i < this.set.size())
 		                    {
 		                        this.set.get(i).compareSNP(positionEnd);
-		                        
-		                        /*if(this.set.get(i).getMinPosition() == positionEnd)
-		                        {
-		                        	bwSNP.write(this.set.get(i).toString_BED("0"));
-		                        }
-		                        else
-		                        {
-		                        	bwoSNP.write(this.set.get(i).toString_BED("1"));  //TODO 
-		                        }*/
 		                    }
 	                    }
 		                    
 	                    line = br.readLine(); //Next line
 	                }
 	                
-	    			//bwSNP.close();
-	    			//bwoSNP.close();
-	                br.close();
+	    			br.close();
 	            }    
 	        } 
 	        catch (FileNotFoundException ex) 
@@ -669,8 +589,6 @@ public class SetCluster extends Thread {
 				}
                 
                 br.close();
-                
-                //TODO Validation
             }
         } 
         catch (FileNotFoundException ex)   {} 
@@ -688,6 +606,10 @@ public class SetCluster extends Thread {
 	   for(int i = 0; i < this.set.size(); i++) //Move up to down - Last to First
        {
             this.set.get(i).clusterProfile();
+            
+            
+            this.maxScore = this.set.get(i).getMutationsRanking() > this.maxScore ? this.set.get(i).getMutationsRanking() : this.maxScore; 
+            this.maxDensity = this.set.get(i).getDensityRanking() > this.maxDensity ? this.set.get(i).getDensityRanking() : this.maxDensity;
        }
    }
    
@@ -869,5 +791,25 @@ public class SetCluster extends Thread {
    public void saveLog()
    {
        Functions.saveInFile(this.folderResults + "/Log.txt", this.log);
+   }
+   
+   
+   /**
+    * 
+    * @return
+    */
+   public int getMaxScore()
+   {
+   	return this.maxScore;
+   }
+   
+   
+   /**
+    * 
+    * @return
+    */
+   public double getMaxDensity()
+   {
+   	return this.maxDensity;
    }
 }
