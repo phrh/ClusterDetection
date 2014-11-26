@@ -1,23 +1,22 @@
-CLIP-seq Cluster Detection Tool
+# CLIP-seq Cluster Detection Tool
 ================
 CLIP-seq protocols combine the action of CLIP (UV Crosslinking and Immunoprecipitation) and NGS (Next Generation Sequencing) to derive a transcriptome-wide set of RBP (RNA Binding Proteins) binding sites. There are different CLIP-seq protocols; each one introduces experimental variations to improve the signal to noise ratio. [1]
 
-In order to process CLIP-seq raw data is important to obtain clusters of sequences. Each cluster contains a set of sequences that overlap at least in one nucleotide, and all the clusters are exclusive. 
+In order to process CLIP-seq raw data is important to obtain clusters of sequences. Each cluster contains a set of sequences that overlap at least in one nucleotide, and all the clusters are exclusive. This software obtains the clusters for a CLIP-seq raw dataset;  it can filter the resultant dataset by filtering read sequences length, cluster minimum number of reads, entropy (to avoid mononucleotide sequences). Moreover, this tool obtains an experimental prior based on information selected by the user (mutations, deletions).
 
-This software obtains the clusters for a CLIP-seq raw dataset;  it can filter the resultant dataset by filtering read sequences length, cluster minimum number of reads, entropy (to avoid mononucleotide sequences). Moreover, this tool obtains an experimental prior based on information selected by the user (mutations, deletions).
+[1] [Reyes-Herrera and Ficarra. Computational Methods for CLIP-seq Data Processing. Bioinformatics and Biology Insights 2014:8 199–207 doi: 10.4137/BBI.S16803.](http://www.la-press.com/computational-methods-for-clip-seq-data-processing-article-a4405)
 
-[1] Reyes-Herrera and Ficarra. Computational Methods for CLIP-seq Data Processing. Bioinformatics and Biology Insights 2014:8 199–207 doi: 10.4137/BBI.S16803.
 
---
-REQUIREMENTS
+Information regarding the software requirements, configuration and inputs, usage and outputs are available at follows.
 
-Java 1.5 or more
+================
 
-Minimum 512 Mb of RAM (Recommended 4 Gb of RAM)
+### Requirements
 
-Any processor (Recommended multi-core processor)
-
-Enough space to save results
+*Java 1.5 or more
+*Minimum 512 Mb of RAM (Recommended 4 Gb of RAM)
+*Any processor (Recommended multi-core processor)
+*Enough space to save results
 	
 
 	
