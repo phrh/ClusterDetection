@@ -13,10 +13,10 @@ Information regarding the software requirements, configuration and inputs, usage
 
 ### Requirements
 
-*Java 1.5 or more
-*Minimum 512 Mb of RAM (Recommended 4 Gb of RAM)
-*Any processor (Recommended multi-core processor)
-*Enough space to save results
+* Java 1.5 or more
+* Minimum 512 Mb of RAM (Recommended 4 Gb of RAM)
+* Any processor (Recommended multi-core processor)
+* Enough space to save results
 	
 
 	
