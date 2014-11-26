@@ -1,5 +1,5 @@
 # CLIP-seq Cluster Detection Tool
-================
+
 CLIP-seq protocols combine the action of CLIP (UV Crosslinking and Immunoprecipitation) and NGS (Next Generation Sequencing) to derive a transcriptome-wide set of RBP (RNA Binding Proteins) binding sites. There are different CLIP-seq protocols; each one introduces experimental variations to improve the signal to noise ratio. [1]
 
 In order to process CLIP-seq raw data is important to obtain clusters of sequences. Each cluster contains a set of sequences that overlap at least in one nucleotide, and all the clusters are exclusive. This software obtains the clusters for a CLIP-seq raw dataset;  it can filter the resultant dataset by filtering read sequences length, cluster minimum number of reads, entropy (to avoid mononucleotide sequences). Moreover, this tool obtains an experimental prior based on information selected by the user (mutations, deletions).
@@ -19,49 +19,49 @@ Information regarding the software requirements, configuration and inputs, usage
 * Enough space to save results
 	
 
-	
---
-CONFIGURATION AND INPUTS
+================	
+
+### Configuration and inputs
 
 You must to create a set-up file (with extension .ini). In that file write values for parameters required to run the application.
-Parameters are: 
 
-DataSet=Data set (in SAM format) of reads obtained experimentally.
+###### Parameters are: 
 
-Filter_Minimum_Ocurrences=This is a filter to reduce no-significant clusters by have a little number of reads aligned. By default is 5.
+* DataSet=Data set (in SAM format) of reads obtained experimentally.
 
-Filter_Minimum_Read_length=This is a filter to reduce no-significant reads by have a little size of sequence. By default is 5.
+* Filter_Minimum_Ocurrences=This is a filter to reduce no-significant clusters by have a little number of reads aligned. By default is 5.
 
-Folder_Results=Path where the results will be saved.
+* Filter_Minimum_Read_length=This is a filter to reduce no-significant reads by have a little size of sequence. By default is 5.
 
-E-mail=Mail to send a message when the experiment is finished.
+* Folder_Results=Path where the results will be saved.
 
-FASTA_Folder=Path of FASTA files.
+* E-mail=Mail to send a message when the experiment is finished.
 
-SNP_Folder=Path of SNP files.
+* FASTA_Folder=Path of FASTA files.
 
-Export_SAM=Flag to export cluster's list in SAM. By default is FALSE.
+* SNP_Folder=Path of SNP files.
 
-Export_BED=Flag to export cluster's list in BED. By default is FALSE.
+* Export_SAM=Flag to export cluster's list in SAM. By default is FALSE.
 
-Filter_Entrophy=Flag to use Shannon's Entropy to filter noise reads. By default is TRUE.
+* Export_BED=Flag to export cluster's list in BED. By default is FALSE.
 
-Mutations=Type of mutations to consider (Options:All, T2C, A2C, A2G, A2T, C2A, C2G, C2T, G2A, G2C, G2T, T2A, T2G).
+* Filter_Entrophy=Flag to use Shannon's Entropy to filter noise reads. By default is TRUE.
 
-Insertions=Type of insertions to consider (Options: All, A, C, G, T).
+* Mutations=Type of mutations to consider (Options:All, T2C, A2C, A2G, A2T, C2A, C2G, C2T, G2A, G2C, G2T, T2A, T2G).
 
-Deletions=Type of deletions to consider (Options: All, A, C, G, T).
+* Insertions=Type of insertions to consider (Options: All, A, C, G, T).
+
+* Deletions=Type of deletions to consider (Options: All, A, C, G, T).
 
 
 Additional parameters in v1.5:
 
-Background=Path of background file.
+* Background=Path of background file.
 
-Background_Score=Filter of minimum read's score value in background to take into account in comparision.
+* Background_Score=Filter of minimum read's score value in background to take into account in comparision.
 
-
-If there's no FASTA files, the application show a message and not execute.
-If folder results non exists, the application will create it.
+If there are not FASTA files, the application shows a message and does not execute the program.
+If folder results does not exist, the application will create it.
 
 
 The setup.ini file (in the same root of this file) is an example of a configuration setup.
