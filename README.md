@@ -66,18 +66,26 @@ If folder results does not exist, the application will create it.
 
 The setup.ini file (in the same root of this file) is an example of a configuration setup.
 
---
-EXECUTION
+================
+
+### Usage
 
 To run, just write on terminal:
 java -jar ClusterDetection_v*.jar Setup_file_name.ini
 
+================
 
---
-OUTPUTS
+### Output
 
-1) Total_clusters: List of all clusters (Optionally can be in format .SAM and .BED)
+1. Total_clusters: List of all clusters (Optionally can be in format .SAM and .BED)
+2.  Filtered_Clusters: List of clusters that pass the filters
+3. Folders of details of clusters, organized by chromosome
 
-2) Filtered_Clusters: List of clusters that pass the filters
+================
 
-3) Folders of details of clusters, organized by chromosome
+### License
+
+Created by Carlos Sierra and Paula H. Reyes-Herrera on 30 November 2014 Copyright (c) 2014 Universidad Antonio Nariño. All rights reserved.
+
+CLIP-seq Cluster Detection Tool is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+
