@@ -10,7 +10,13 @@ In order to process CLIP-seq raw data is important to obtain clusters of sequenc
 Information regarding the software requirements, configuration and inputs, usage and outputs are available at follows.
 
 ================
+### License
 
+Created by Carlos Sierra and Paula H. Reyes-Herrera on 30 May 2014 Copyright (c) 2014 Universidad Antonio Nariño. All rights reserved.
+
+CLIP-seq Cluster Detection Tool is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+
+================
 ### Requirements
 
 * Java 1.5 or more
