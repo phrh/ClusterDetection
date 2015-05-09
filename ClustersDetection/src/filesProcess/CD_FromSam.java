@@ -508,6 +508,14 @@ public class CD_FromSam extends Thread
     }
     
     
+    /**
+     * 
+     * @param folderResults
+     * @param minSequences
+     * @param minLength
+     * @param fastaPath
+     * @param snpPath
+     */
     public void createChromosomes(String folderResults, int minSequences, int minLength, String fastaPath, String snpPath)
     {
     	this.chromosomes.add(new Chromosome("chr1", 249250621, folderResults, minSequences, minLength, fastaPath, snpPath));

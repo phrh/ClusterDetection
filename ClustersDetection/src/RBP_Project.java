@@ -126,7 +126,7 @@ public class RBP_Project {
                             }
                 		}
                 		break;
-                		case "Background":
+                		case "Noise_Reads":
                 		{
                 			noisePath = field_value[1];
                 		}

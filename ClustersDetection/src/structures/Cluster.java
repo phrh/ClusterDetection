@@ -925,25 +925,32 @@ public class Cluster extends Thread{
     	double prior[] = new double[this.mutations[0].length];
     	String result = "";
     	double total = 0.0;
+    	int i = 0, j = 0;
     	
-    	for(int i = 0; i < prior.length; i++)
-    	{
-    		for(int j = 0; j < window; j++)
-    		{
-    			prior[i] += (i + j) < prior.length ? (double)this.mutation[i] : 0.0;
-    		}
+    	for(i = 0; i < prior.length; i++)
+        	{
+        		
+    			for(j = 0; j < window; j++)
+        		{
+        			System.out.println(i + "\t" + j + "\t" + prior.length);
+    				
+    				prior[i] += (i + j) < prior.length ? (double)this.mutation[i + j] : 0.0;
+        		}
+        		
+        		total += prior[i];
+        		
+        		result += ">" + this.chromosome + ":" + this.minPosition + ":" + this.maxPosition + ":" + this.strand + "\n";
+        	}
     		
-    		total += prior[i];
-    	}
+        	for(i = 0; i < prior.length; i++)
+        	{
+        		prior[i] /= total;
+        		result += (Double.isNaN(prior[i]) ? "0.0" : prior[i]) + " ";
+        	}
+        	
+		
     	
-    	result += ">" + this.chromosome + ":" + this.minPosition + ":" + this.maxPosition + ":" + this.strand + "\n";
-    	
-    	for(int i = 0; i < prior.length; i++)
-    	{
-    		prior[i] /= total;
-    		result += (Double.isNaN(prior[i]) ? "0.0" : prior[i]) + " ";
-    	}
-    	
+    	    	
     	return  result + "\n";
     }
    
