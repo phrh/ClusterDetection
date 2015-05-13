@@ -1,5 +1,5 @@
 /*
-CLIP-seq CLuster Detection - Tool to detect clusters of an experimental data set of RBP obtained by CLIP-seq protocol.
+# CLIP-seq CLuster Detection - Tool to detect clusters of an experimental data set of RBP obtained by CLIP-seq protocol.
 #
 # Created by Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra on August 2014.
 # Copyright (c) 2014 Paula H. Reyes-Herrera PhD. and Msc. Carlos Andres Sierra. Universidad Antonio Narino. All rights reserved.

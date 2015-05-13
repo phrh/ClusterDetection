@@ -922,7 +922,7 @@ public class Cluster extends Thread{
     
     public String toString_Prior(int window)
     {
-    	double prior[] = new double[this.mutations[0].length];
+    	double prior[] = new double[this.mutation.length];
     	String result = "";
     	double total = 0.0;
     	int i = 0, j = 0;
@@ -932,9 +932,7 @@ public class Cluster extends Thread{
         		
     			for(j = 0; j < window; j++)
         		{
-        			System.out.println(i + "\t" + j + "\t" + prior.length);
-    				
-    				prior[i] += (i + j) < prior.length ? (double)this.mutation[i + j] : 0.0;
+        			prior[i] += (i + j) < prior.length ? (double)this.mutation[i + j] : 0.0;
         		}
         		
         		total += prior[i];

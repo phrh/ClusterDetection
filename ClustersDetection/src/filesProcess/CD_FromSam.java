@@ -127,7 +127,7 @@ public class CD_FromSam extends Thread
         int[] occurrences = new int[4]; //Occurrences of the strands
 
         
-        System.out.println("=====Wellcome to CLIP-seq Cluster Detection===== \n\nProcessing...");   log += "Processing...\n";
+        System.out.println("=====Welcome to CLIP-seq Cluster Detection===== \n\nProcessing...");   log += "Processing...\n";
         
         //Load background
         if(!noisePath.toLowerCase().equals("none"))
