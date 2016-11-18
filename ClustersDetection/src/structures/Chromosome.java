@@ -35,7 +35,7 @@ public class Chromosome extends Thread
     private SetCluster clustersFilter = null; //Clusters with read-length filter
     
     //Parameters for process
-    private String folderResults;
+    private String folderResults; //Folder to save all clusters
     private int minLength; 
     
     
